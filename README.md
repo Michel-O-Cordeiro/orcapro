@@ -1,4 +1,4 @@
-# OrçaPro (Front-end)
+# OrçaPro
 
 Aplicação web da OrçaPro para gerenciamento de orçamentos voltada para prestadores de serviços (pedreiros, eletricistas, pintores, hidráulicos e muito mais). O objetivo do OrçaPro é centralizar, organizar e disponibilizar uma solução completa para criação, edição e acompanhamento de orçamentos, além de gerenciamento de clientes.
 

@@ -43,55 +43,55 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Imagem de fundo - apenas em telas grandes (md+) */}
+      {/* Imagem de fundo - apenas em telas grandes (lg+) */}
       <div 
-        className="hidden md:block md:w-1/2 bg-cover bg-left relative"
+        className="hidden lg:block lg:w-1/2 bg-cover bg-left relative"
         style={{ backgroundImage: `url(${loginBg})` }}
       >
       </div>
-      {/* Formulário - ocupa 100% da tela em mobile, 50% em telas grandes */}
-      <div className="w-full md:w-1/2 bg-white p-6 sm:p-8 md:p-12 flex items-center justify-center">
+      {/* Formulário - ocupa 100% da tela em mobile/tablet, 50% em telas grandes */}
+      <div className="w-full lg:w-1/2 bg-white p-4 sm:p-6 md:p-8 lg:p-12 flex items-center justify-center">
         <Card className="w-full max-w-md border-none shadow-none">
           <CardHeader className="text-center pb-2">
-            <div className="flex justify-center mb-6">
-              <img src={logoImg} alt="Logo OrçaPro" className="h-40 sm:h-48 md:h-60" />
+            <div className="flex justify-center mb-4">
+              <img src={logoImg} alt="Logo OrçaPro" className="h-28 sm:h-36 md:h-44 lg:h-60" />
             </div>
-            <CardTitle className="text-2xl sm:text-3xl font-extrabold text-gray-800 mb-2">
+            <CardTitle className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-800 mb-2">
               Recupere sua senha
             </CardTitle>
-            <p className="text-gray-500 text-sm sm:text-base">
+            <p className="text-gray-500 text-xs sm:text-sm md:text-base">
               Para experiências rápidas e precisas
             </p>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {!isSuccess ? (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm sm:text-base">E-mail</Label>
+                    <Label htmlFor="email" className="text-xs sm:text-sm md:text-base">E-mail</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                       <Input
                         id="email"
                         type="email"
                         placeholder="Digite seu e-mail"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10 h-10 sm:h-11"
+                        className="pl-10 h-9 sm:h-10 md:h-11"
                         required
                       />
                     </div>
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 h-10 sm:h-11 text-base"
+                    className="w-full bg-blue-600 hover:bg-blue-700 h-9 sm:h-10 md:h-11 text-sm md:text-base"
                   >
                     Enviar
                   </Button>
                   <Button
                     type="button"
                     variant="secondary"
-                    className="w-full h-10 sm:h-11 text-base"
+                    className="w-full h-9 sm:h-10 md:h-11 text-sm md:text-base"
                     onClick={() => navigate('/login')}
                   >
                     Voltar para login
@@ -99,10 +99,10 @@ export default function ForgotPasswordPage() {
                 </>
               ) : (
                 <>
-                  <p className="text-green-600 text-center py-4 text-sm sm:text-base">{message}</p>
+                  <p className="text-green-600 text-center py-4 text-xs sm:text-sm md:text-base">{message}</p>
                   <Button
                     type="button"
-                    className="w-full bg-blue-600 hover:bg-blue-700 h-10 sm:h-11 text-base"
+                    className="w-full bg-blue-600 hover:bg-blue-700 h-9 sm:h-10 md:h-11 text-sm md:text-base"
                     onClick={() => navigate('/login')}
                   >
                     Voltar para login

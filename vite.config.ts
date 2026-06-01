@@ -4,6 +4,9 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    chunkSizeWarningLimit: 1200,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

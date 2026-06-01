@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCKQXAeHiT8OiAuPtDhKtXjJUBt3FHVdoo",
+  apiKey: process.env.apiKey,
   authDomain: "orcapro-4a0c9.firebaseapp.com",
   projectId: "orcapro-4a0c9",
   storageBucket: "orcapro-4a0c9.firebasestorage.app",

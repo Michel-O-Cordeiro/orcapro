@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
 const firebaseConfig = {
-  apiKey: process.env.API_KEY,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "orcapro-4a0c9.firebaseapp.com",
   projectId: "orcapro-4a0c9",
   storageBucket: "orcapro-4a0c9.firebasestorage.app",

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Mail } from 'lucide-react'
 import loginBg from '../assets/login.png'
 import logoImg from '../assets/logo.png'
+import { useAppStore } from '@/stores/useAppStore'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -14,15 +15,30 @@ export default function ForgotPasswordPage() {
   const [isSuccess, setIsSuccess] = useState(false)
   const navigate = useNavigate()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setMessage('')
     setIsSuccess(false)
 
-    setTimeout(() => {
+    try {
+      await useAppStore.getState().forgotPassword(email)
       setMessage('E-mail de recuperação enviado! Verifique sua caixa de entrada.')
       setIsSuccess(true)
-    }, 1000)
+    } catch (error: any) {
+      const errorCode = error.code
+      let errorMessage = 'Ocorreu um erro ao enviar o e-mail de recuperação.'
+      
+      if (errorCode === 'auth/invalid-email') {
+        errorMessage = 'E-mail inválido. Verifique o formato.'
+      } else if (errorCode === 'auth/user-not-found') {
+        errorMessage = 'Nenhuma conta encontrada com este e-mail.'
+      } else if (errorCode === 'auth/too-many-requests') {
+        errorMessage = 'Muitas tentativas. Tente novamente mais tarde.'
+      }
+      
+      setMessage(errorMessage)
+      setIsSuccess(false)
+    }
   }
 
   return (

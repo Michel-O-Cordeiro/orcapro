@@ -2,7 +2,6 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { Home, Users, FileText, LogOut } from 'lucide-react'
 import { useAppStore } from '@/stores/useAppStore'
 import type { AppState } from '@/stores/useAppStore'
-import { useEffect } from 'react'
 
 export default function MainLayout() {
   const theme = useAppStore((state: AppState) => state.theme)
@@ -14,20 +13,14 @@ export default function MainLayout() {
 
   const isActive = (path: string) => location.pathname === path
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login')
-    }
-  }, [user, navigate])
 
-  const handleLogout = () => {
-    logout()
+
+  const handleLogout = async () => {
+    await logout()
     navigate('/login')
   }
 
-  if (!user) {
-    return null
-  }
+
 
   return (
     <div className={theme}>
@@ -77,7 +70,7 @@ export default function MainLayout() {
               </div>
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-muted-foreground hidden sm:inline">
-                  Olá, {user.name}
+                  Olá, {user?.name || ''}
                 </span>
                 <button
                   onClick={toggleTheme}

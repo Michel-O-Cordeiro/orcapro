@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAppStore } from '@/stores/useAppStore'
+import { useToast } from '../contexts/ToastContext'
 import type { Budget, BudgetItem } from '@/types'
 import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react'
 
@@ -13,7 +14,17 @@ export default function BudgetFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { budgets, clients, addBudget, updateBudget } = useAppStore()
+  const { showToast } = useToast()
   const isEditing = !!id
+  const [isSaving, setIsSaving] = useState(false)
+  const [errors, setErrors] = useState({
+    clientId: '',
+    title: '',
+    description: '',
+    status: '',
+    items: '',
+    itemPrices: '' as string | null,
+  })
 
   const [formData, setFormData] = useState({
     clientId: '',
@@ -60,14 +71,73 @@ export default function BudgetFormPage() {
     setFormData({ ...formData, items: updatedItems, total })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (isEditing) {
-      updateBudget(id!, formData)
-    } else {
-      addBudget(formData)
+    
+    const newErrors = {
+      clientId: '',
+      title: '',
+      description: '',
+      status: '',
+      items: '',
+      itemPrices: null as string | null,
     }
-    navigate('/orcamentos')
+    
+    if (!formData.clientId.trim()) {
+      newErrors.clientId = 'Selecione um cliente'
+    }
+    
+    if (!formData.title.trim()) {
+      newErrors.title = 'Título do orçamento é obrigatório'
+    }
+    
+    if (!formData.description.trim()) {
+      newErrors.description = 'Descrição é obrigatória'
+    }
+    
+    if (!formData.status.trim()) {
+      newErrors.status = 'Selecione um status'
+    }
+    
+    if (formData.items.length === 0) {
+      newErrors.items = 'Adicione pelo menos 1 item ao orçamento'
+    }
+    
+    const hasZeroPriceItem = formData.items.some(item => item.unitPrice <= 0)
+    if (hasZeroPriceItem) {
+      newErrors.itemPrices = 'Todos os itens devem ter preço maior que 0'
+    }
+    
+    const hasZeroQuantityItem = formData.items.some(item => item.quantity < 1)
+    if (hasZeroQuantityItem) {
+      newErrors.itemPrices = newErrors.itemPrices || 'Todos os itens devem ter quantidade maior que 0'
+    }
+    
+    const hasEmptyDescriptionItem = formData.items.some(item => !item.description.trim())
+    if (hasEmptyDescriptionItem) {
+      newErrors.itemPrices = newErrors.itemPrices || 'Todos os itens devem ter descrição'
+    }
+    
+    setErrors(newErrors)
+    if (Object.values(newErrors).some(err => err)) {
+      return
+    }
+    
+    setIsSaving(true)
+    try {
+      if (isEditing) {
+        await updateBudget(id!, formData)
+        showToast('Orçamento atualizado com sucesso!')
+      } else {
+        await addBudget(formData)
+        showToast('Orçamento criado com sucesso!')
+      }
+      navigate('/orcamentos')
+    } catch (error) {
+      console.error('Erro ao salvar orçamento:', error)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -91,9 +161,11 @@ export default function BudgetFormPage() {
             <select
               id="clientId"
               value={formData.clientId}
-              onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              required
+              onChange={(e) => {
+                setFormData({ ...formData, clientId: e.target.value })
+                if (errors.clientId) setErrors({ ...errors, clientId: '' })
+              }}
+              className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${errors.clientId ? 'border-red-500 ring-red-500' : 'border-input focus-visible:ring-ring'}`}
             >
               <option value="">Selecione um cliente</option>
               {clients.map((client) => (
@@ -102,6 +174,7 @@ export default function BudgetFormPage() {
                 </option>
               ))}
             </select>
+            {errors.clientId && <p className="text-red-500 text-sm mt-1">{errors.clientId}</p>}
           </div>
 
           <div className="lg:col-span-2">
@@ -109,9 +182,13 @@ export default function BudgetFormPage() {
             <Input
               id="title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              required
+              onChange={(e) => {
+                setFormData({ ...formData, title: e.target.value })
+                if (errors.title) setErrors({ ...errors, title: '' })
+              }}
+              className={errors.title ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
+            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
           </div>
 
           <div className="lg:col-span-1">
@@ -119,13 +196,16 @@ export default function BudgetFormPage() {
             <select
               id="status"
               value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              required
+              onChange={(e) => {
+                setFormData({ ...formData, status: e.target.value as any })
+                if (errors.status) setErrors({ ...errors, status: '' })
+              }}
+              className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${errors.status ? 'border-red-500 ring-red-500' : 'border-input focus-visible:ring-ring'}`}
             >
               <option value="draft">Rascunho</option>
               <option value="sent">Enviado</option>
             </select>
+            {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status}</p>}
           </div>
 
           <div className="md:col-span-2 lg:col-span-4">
@@ -133,9 +213,13 @@ export default function BudgetFormPage() {
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              required
+              onChange={(e) => {
+                setFormData({ ...formData, description: e.target.value })
+                if (errors.description) setErrors({ ...errors, description: '' })
+              }}
+              className={errors.description ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
+            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
           </div>
         </div>
 
@@ -156,9 +240,11 @@ export default function BudgetFormPage() {
                   <Label>Descrição</Label>
                   <Input
                     value={item.description}
-                    onChange={(e) => updateItem(index, 'description', e.target.value)}
+                    onChange={(e) => {
+                      updateItem(index, 'description', e.target.value)
+                      if (errors.itemPrices) setErrors({ ...errors, itemPrices: null })
+                    }}
                     placeholder="Ex: Instalação de piso"
-                    required
                   />
                 </div>
                 <div className="col-span-1 md:col-span-2">
@@ -167,19 +253,23 @@ export default function BudgetFormPage() {
                     type="number"
                     min="1"
                     value={item.quantity}
-                    onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 1)}
-                    required
+                    onChange={(e) => {
+                      updateItem(index, 'quantity', parseInt(e.target.value) || 1)
+                      if (errors.itemPrices) setErrors({ ...errors, itemPrices: null })
+                    }}
                   />
                 </div>
                 <div className="col-span-1 md:col-span-2 lg:col-span-3">
                   <Label>Preço Unitário (R$)</Label>
                   <Input
                     type="number"
-                    min="0"
+                    min="0.01"
                     step="0.01"
                     value={item.unitPrice}
-                    onChange={(e) => updateItem(index, 'unitPrice', parseFloat(e.target.value) || 0)}
-                    required
+                    onChange={(e) => {
+                      updateItem(index, 'unitPrice', parseFloat(e.target.value) || 0)
+                      if (errors.itemPrices) setErrors({ ...errors, itemPrices: null })
+                    }}
                   />
                 </div>
                 <div className="col-span-1 md:col-span-2 lg:col-span-1">
@@ -199,6 +289,12 @@ export default function BudgetFormPage() {
                 </div>
               </div>
             ))}
+
+            {(errors.items || errors.itemPrices) && (
+              <p className="text-red-500 text-sm">
+                {errors.items || errors.itemPrices}
+              </p>
+            )}
 
             {formData.items.length === 0 && (
               <p className="text-muted-foreground text-center py-8">
@@ -220,12 +316,21 @@ export default function BudgetFormPage() {
         </Card>
 
         <div className="flex justify-end space-x-2">
-          <Button type="button" variant="secondary" asChild>
+          <Button type="button" variant="secondary" asChild disabled={isSaving}>
             <Link to="/orcamentos">Cancelar</Link>
           </Button>
-          <Button type="submit">
-            <Save className="w-4 h-4 mr-2" />
-            {isEditing ? 'Salvar Alterações' : 'Criar Orçamento'}
+          <Button type="submit" disabled={isSaving}>
+            {isSaving ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                <span>Salvando...</span>
+              </div>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                {isEditing ? 'Salvar Alterações' : 'Criar Orçamento'}
+              </>
+            )}
           </Button>
         </div>
       </form>

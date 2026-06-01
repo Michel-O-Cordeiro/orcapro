@@ -5,54 +5,64 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAppStore } from '@/stores/useAppStore'
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react'
 import loginBg from '../assets/login.png'
 import logoImg from '../assets/logo.png'
 
-export default function LoginPage() {
+export default function RegisterPage() {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    
+    if (password !== confirmPassword) {
+      setError('As senhas não conferem.')
+      return
+    }
+    
+    if (password.length < 6) {
+      setError('A senha deve ter pelo menos 6 caracteres.')
+      return
+    }
 
+    setIsLoading(true)
     try {
-      await useAppStore.getState().login(email, password)
+      await useAppStore.getState().register(name, email, password)
       navigate('/')
     } catch (error: any) {
       const errorCode = error.code
-      let errorMessage = 'E-mail ou senha incorretos.'
+      let errorMessage = 'Ocorreu um erro ao criar a conta.'
       
-      if (errorCode === 'auth/invalid-email') {
+      if (errorCode === 'auth/email-already-in-use') {
+        errorMessage = 'Este e-mail já está sendo usado por outra conta.'
+      } else if (errorCode === 'auth/invalid-email') {
         errorMessage = 'E-mail inválido. Verifique o formato.'
-      } else if (errorCode === 'auth/user-disabled') {
-        errorMessage = 'Esta conta foi desativada.'
-      } else if (errorCode === 'auth/user-not-found') {
-        errorMessage = 'Nenhuma conta encontrada com este e-mail.'
-      } else if (errorCode === 'auth/wrong-password') {
-        errorMessage = 'Senha incorreta. Tente novamente.'
-      } else if (errorCode === 'auth/too-many-requests') {
-        errorMessage = 'Muitas tentativas. Tente novamente mais tarde.'
-      } else if (errorCode === 'auth/invalid-credential') {
-        errorMessage = 'Credenciais inválidas. Verifique e-mail e senha.'
+      } else if (errorCode === 'auth/weak-password') {
+        errorMessage = 'Senha muito fraca. Use pelo menos 6 caracteres.'
+      } else if (errorCode === 'auth/operation-not-allowed') {
+        errorMessage = 'Operação não permitida. Contate o suporte.'
       }
       
       setError(errorMessage)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
     <div className="min-h-screen flex">
-
       <div 
         className="hidden md:block md:w-1/2 bg-cover bg-left relative"
         style={{ backgroundImage: `url(${loginBg})` }}
-      >
-      </div>
+      ></div>
   
       <div className="w-full md:w-1/2 bg-white p-6 sm:p-8 md:p-12 flex items-center justify-center">
         <Card className="w-full max-w-md border-none shadow-none">
@@ -61,14 +71,29 @@ export default function LoginPage() {
               <img src={logoImg} alt="Logo OrçaPro" className="h-40 sm:h-48 md:h-60" />
             </div>
             <CardTitle className="text-2xl sm:text-3xl font-extrabold text-gray-800 mb-2">
-              Bem-vindo de volta
+              Criar Conta
             </CardTitle>
             <p className="text-gray-500 text-sm sm:text-base">
-              Para experiências rápidas e precisas
+              Comece a gerenciar seus orçamentos
             </p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm sm:text-base">Nome</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Seu nome completo"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="pl-10 h-10 sm:h-11"
+                    required
+                  />
+                </div>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm sm:text-base">E-mail</Label>
                 <div className="relative">
@@ -76,7 +101,7 @@ export default function LoginPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@gmail.com"
+                    placeholder="seu@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10 h-10 sm:h-11"
@@ -91,7 +116,7 @@ export default function LoginPage() {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="123456"
+                    placeholder="Mínimo 6 caracteres"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10 pr-10 h-10 sm:h-11"
@@ -106,18 +131,27 @@ export default function LoginPage() {
                   </button>
                 </div>
               </div>
-              <div className="flex justify-between">
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-sm sm:text-base">Confirmar Senha</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    id="confirmPassword"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Confirme sua senha"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="pl-10 h-10 sm:h-11"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex justify-center">
                 <Link
-                  to="/register"
+                  to="/login"
                   className="text-blue-600 text-sm sm:text-base hover:underline"
                 >
-                  Criar conta
-                </Link>
-                <Link
-                  to="/forgot-password"
-                  className="text-blue-600 text-sm sm:text-base hover:underline"
-                >
-                  Esqueci minha senha
+                  Já tem uma conta? Entrar
                 </Link>
               </div>
               {error && (
@@ -125,9 +159,10 @@ export default function LoginPage() {
               )}
               <Button
                 type="submit"
+                disabled={isLoading}
                 className="w-full bg-blue-600 hover:bg-blue-700 h-10 sm:h-11 text-base"
               >
-                Entrar
+                {isLoading ? 'Criando conta...' : 'Criar Conta'}
               </Button>
             </form>
           </CardContent>

@@ -10,6 +10,7 @@ export default function HomePage() {
   
   const totalBudgets = budgets.length
   const approvedBudgets = budgets.filter(b => b.status === 'approved').length
+  const approvalRate = totalBudgets > 0 ? Math.round((approvedBudgets / totalBudgets) * 100) : 0
   const totalRevenue = budgets.filter(b => b.status === 'approved').reduce((sum, b) => sum + b.total, 0)
 
   return (
@@ -56,7 +57,7 @@ export default function HomePage() {
           <CardContent>
             <div className="text-2xl font-bold">{approvedBudgets}</div>
             <p className="text-xs text-muted-foreground">
-              {Math.round((approvedBudgets / totalBudgets) * 100)}% de aprovação
+              {approvalRate}% de aprovação
             </p>
           </CardContent>
         </Card>
@@ -84,28 +85,34 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {budgets.slice().reverse().slice(0, 5).map((budget) => {
-                const client = clients.find(c => c.id === budget.clientId)
-                return (
-                  <div key={budget.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 border rounded-lg gap-2">
-                    <div>
-                      <p className="font-medium">{budget.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {client?.name} • R$ {budget.total.toLocaleString('pt-BR')}
-                      </p>
+              {budgets.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  Não tem orçamentos no momento
+                </p>
+              ) : (
+                budgets.slice().reverse().slice(0, 5).map((budget) => {
+                  const client = clients.find(c => c.id === budget.clientId)
+                  return (
+                    <div key={budget.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 border rounded-lg gap-2">
+                      <div>
+                        <p className="font-medium">{budget.title}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {client?.name} • R$ {budget.total.toLocaleString('pt-BR')}
+                        </p>
+                      </div>
+                      <Badge variant={
+                        budget.status === 'approved' ? 'success' :
+                        budget.status === 'rejected' ? 'destructive' :
+                        budget.status === 'sent' ? 'warning' : 'secondary'
+                      }>
+                        {budget.status === 'draft' ? 'Rascunho' :
+                         budget.status === 'sent' ? 'Enviado' :
+                         budget.status === 'approved' ? 'Aprovado' : 'Recusado'}
+                      </Badge>
                     </div>
-                    <Badge variant={
-                      budget.status === 'approved' ? 'success' :
-                      budget.status === 'rejected' ? 'destructive' :
-                      budget.status === 'sent' ? 'warning' : 'secondary'
-                    }>
-                      {budget.status === 'draft' ? 'Rascunho' :
-                       budget.status === 'sent' ? 'Enviado' :
-                       budget.status === 'approved' ? 'Aprovado' : 'Recusado'}
-                    </Badge>
-                  </div>
-                )
-              })}
+                  )
+                })
+              )}
             </div>
           </CardContent>
         </Card>
@@ -116,14 +123,20 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {clients.slice().reverse().slice(0, 5).map((client) => (
-                <div key={client.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{client.name}</p>
-                    <p className="text-sm text-muted-foreground">{client.email}</p>
+              {clients.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  Não tem clientes no momento
+                </p>
+              ) : (
+                clients.slice().reverse().slice(0, 5).map((client) => (
+                  <div key={client.id} className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{client.name}</p>
+                      <p className="text-sm text-muted-foreground">{client.email}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>

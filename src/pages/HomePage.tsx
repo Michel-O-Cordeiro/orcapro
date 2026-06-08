@@ -16,7 +16,7 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         <Button asChild>
           <Link to="/orcamentos/novo">Novo Orçamento</Link>
         </Button>
@@ -30,9 +30,6 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{clients.length}</div>
-            <p className="text-xs text-muted-foreground">
-              +2 novos este mês
-            </p>
           </CardContent>
         </Card>
 
@@ -43,9 +40,6 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalBudgets}</div>
-            <p className="text-xs text-muted-foreground">
-              +1 novo esta semana
-            </p>
           </CardContent>
         </Card>
 

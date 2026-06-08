@@ -149,7 +149,7 @@ export default function BudgetFormPage() {
             Voltar
           </Link>
         </Button>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="text-2xl font-bold tracking-tight">
           {isEditing ? 'Editar Orçamento' : 'Novo Orçamento'}
         </h1>
       </div>
@@ -165,11 +165,11 @@ export default function BudgetFormPage() {
                 setFormData({ ...formData, clientId: e.target.value })
                 if (errors.clientId) setErrors({ ...errors, clientId: '' })
               }}
-              className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${errors.clientId ? 'border-red-500 ring-red-500' : 'border-input focus-visible:ring-ring'}`}
+              className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 text-foreground bg-background ${errors.clientId ? 'border-red-500 ring-red-500' : 'border-input focus-visible:ring-ring'}`}
             >
-              <option value="">Selecione um cliente</option>
+              <option value="" className="bg-popover text-popover-foreground">Selecione um cliente</option>
               {clients.map((client) => (
-                <option key={client.id} value={client.id}>
+                <option key={client.id} value={client.id} className="bg-popover text-popover-foreground">
                   {client.name}
                 </option>
               ))}
@@ -200,10 +200,10 @@ export default function BudgetFormPage() {
                 setFormData({ ...formData, status: e.target.value as any })
                 if (errors.status) setErrors({ ...errors, status: '' })
               }}
-              className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${errors.status ? 'border-red-500 ring-red-500' : 'border-input focus-visible:ring-ring'}`}
+              className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 text-foreground bg-background ${errors.status ? 'border-red-500 ring-red-500' : 'border-input focus-visible:ring-ring'}`}
             >
-              <option value="draft">Rascunho</option>
-              <option value="sent">Enviado</option>
+              <option value="draft" className="bg-popover text-popover-foreground">Rascunho</option>
+              <option value="sent" className="bg-popover text-popover-foreground">Enviado</option>
             </select>
             {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status}</p>}
           </div>
@@ -260,7 +260,7 @@ export default function BudgetFormPage() {
                   />
                 </div>
                 <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                  <Label>Preço Unitário (R$)</Label>
+                  <Label>Preço Uni. (R$)</Label>
                   <Input
                     type="number"
                     min="0.01"

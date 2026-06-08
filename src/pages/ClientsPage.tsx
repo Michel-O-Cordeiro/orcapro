@@ -153,16 +153,16 @@ export default function ClientsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className='mt-2'>
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Clientes</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Clientes</h1>
         <Button onClick={() => setIsModalOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Novo Cliente
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
         {clients.length === 0 ? (
           <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
             <Users className="w-16 h-16 text-muted-foreground mb-4" />

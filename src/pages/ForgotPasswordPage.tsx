@@ -43,13 +43,11 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Imagem de fundo - apenas em telas grandes (lg+) */}
       <div 
         className="hidden lg:block lg:w-1/2 bg-cover bg-left relative"
         style={{ backgroundImage: `url(${loginBg})` }}
       >
       </div>
-      {/* Formulário - ocupa 100% da tela em mobile/tablet, 50% em telas grandes */}
       <div className="w-full lg:w-1/2 bg-white p-4 sm:p-6 md:p-8 lg:p-12 flex items-center justify-center">
         <Card className="w-full max-w-md border-none shadow-none">
           <CardHeader className="text-center pb-2">

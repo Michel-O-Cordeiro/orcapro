@@ -34,7 +34,7 @@ export default function BudgetDetailPage() {
               Voltar
             </Link>
           </Button>
-          <h1 className="text-3xl font-bold tracking-tight">{budget.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{budget.title}</h1>
         </div>
         <div className="flex space-x-2">
           <Button variant="ghost" onClick={() => window.print()}>
